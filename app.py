@@ -30,7 +30,7 @@ with st.expander("ℹ️ **Come viene calcolato il punteggio? (Metodologia & Imp
     st.markdown("""
     Il **Magister Pension Score** misura l'efficienza globale di ogni comparto da **0 a 100**:
     * **45% Score Costi (ISC):** Valuta l'impatto delle commissioni a 10 e 35 anni rispetto alla media di categoria.
-    * **40% Score Rendimenti:** Valuta la capacità della gestione di generare extra-rendimento netto.
+    * **40% Score Rendimenti:** Valuta i rendimenti storici e la capacità della gestione di generare valore netto.
     * **15% Consistenza:** Premia lo storico e la stabilità del fondo nel tempo.
     
     ⚠️ **L'impatto dei costi nel tempo:** Un Indicatore Sintetico di Costo (ISC) del **2,0%** annuo su un orizzonte di 35 anni può erodere oltre il **35-40% del capitale finale** rispetto a un fondo efficiente con ISC dello **0,3%**.
@@ -58,22 +58,22 @@ cat_mio = dati_mio['macro_categoria']
 # Top fondo della stessa categoria
 top_fondo_cat = df[df['macro_categoria'] == cat_mio].sort_values(by='magister_score', ascending=False).iloc[0]
 
-# Visualizzazione Confronto 1-vs-1
+# Visualizzazione Confronto 1-vs-1 con ISC e Rendimento
 c1, c2 = st.columns(2)
 
 with c1:
     st.info(f"**IL TUO FONDO:** {dati_mio['fondo']} ({dati_mio['comparto']})")
     st.metric("Magister Score", f"{dati_mio['magister_score']}/100")
     st.write(f"• **Categoria:** {dati_mio['macro_categoria']}")
-    st.write(f"• **Score Costi:** {dati_mio['score_costi']:.1f}/100")
-    st.write(f"• **ISC 10 Anni:** {dati_mio['isc_10']:.2f}%")
+    st.write(f"• **ISC 10 Anni (Costo):** {dati_mio['isc_10']:.2f}%")
+    st.write(f"• **Rendimento Annuo:** {dati_mio['rendimento_annuo']:.2f}%")
 
 with c2:
     st.success(f"**TOP DI CATEGORIA ({cat_mio}):** {top_fondo_cat['fondo']} ({top_fondo_cat['comparto']})")
     st.metric("Magister Score", f"{top_fondo_cat['magister_score']}/100", delta=f"{top_fondo_cat['magister_score'] - dati_mio['magister_score']:.1f} punti")
     st.write(f"• **Categoria:** {top_fondo_cat['macro_categoria']}")
-    st.write(f"• **Score Costi:** {top_fondo_cat['score_costi']:.1f}/100")
-    st.write(f"• **ISC 10 Anni:** {top_fondo_cat['isc_10']:.2f}%")
+    st.write(f"• **ISC 10 Anni (Costo):** {top_fondo_cat['isc_10']:.2f}%")
+    st.write(f"• **Rendimento Annuo:** {top_fondo_cat['rendimento_annuo']:.2f}%")
 
 st.markdown("---")
 
@@ -94,13 +94,12 @@ if ricerca_nome:
 
 st.subheader("📋 Classifica Generale Completa")
 
-df_display = df_filtered[['posizione', 'tipo', 'fondo', 'comparto', 'macro_categoria', 'magister_score', 'score_costi', 'score_rendimenti', 'isc_10']].copy()
-df_display.columns = ['Pos.', 'Tipo', 'Fondo Pensione', 'Comparto', 'Categoria', 'Magister Score', 'Score Costi', 'Score Rendimenti', 'ISC 10y']
+df_display = df_filtered[['posizione', 'tipo', 'fondo', 'comparto', 'macro_categoria', 'magister_score', 'isc_10', 'rendimento_annuo']].copy()
+df_display.columns = ['Pos.', 'Tipo', 'Fondo Pensione', 'Comparto', 'Categoria', 'Magister Score', 'ISC 10y (Costo)', 'Rendimento Annuo']
 
 df_display['Magister Score'] = df_display['Magister Score'].map('{:.1f} ⭐️'.format)
-df_display['Score Costi'] = df_display['Score Costi'].map('{:.1f}'.format)
-df_display['Score Rendimenti'] = df_display['Score Rendimenti'].map('{:.1f}'.format)
-df_display['ISC 10y'] = df_display['ISC 10y'].map('{:.2f}%'.format)
+df_display['ISC 10y (Costo)'] = df_display['ISC 10y (Costo)'].map('{:.2f}%'.format)
+df_display['Rendimento Annuo'] = df_display['Rendimento Annuo'].map('{:.2f}%'.format)
 
 st.table(df_display)
 
@@ -113,10 +112,10 @@ Il fondo pensione è solo una tessera del tuo puzzle finanziario. Valutare costi
 **Compila il modulo per analizzare la tua posizione con il team di Magister Coin:**
 """)
 
-# Inserisci qui il link dell'iframe di Brevo
+# INSERISCI QUI IL LINK DEL TUO MODULO BREVO
 URL_MODULO_BREVO = "https://647fb00d.sibforms.com/serve/MUIFAJ0dVuXVwv3HVUgXDSbMsvPDu_K-ETsYbd_KsaLMdUddvOZKLunex6H0rzLa4wg3lHNXnJu_UV0fehiZ5jaZVk-epo-5H1QccEFiWRgIIs0fuKFUPswS1nHyowjYVmonIFvT-YxeSK-ZcnIel97D_7hCNp--MlhzfEYBJOTrQYboiXAc5w1JVhfO4uRwGn1c2QCeW0LG4rmkog==" 
 
-st.components.v1.iframe(URL_MODULO_BREVO, height=520, scrolling=True)
+st.iframe(URL_MODULO_BREVO, height=520, scrolling=True)
 
 # --- 6. DISCLAIMER ---
 st.markdown("---")
