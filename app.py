@@ -130,7 +130,7 @@ Il fondo pensione è solo una tessera del tuo puzzle finanziario. Valutare costi
 """)
 
 # INSERISCI QUI IL LINK DEL TUO MODULO BREVO
-URL_MODULO_BREVO = "https://www.magistercoin.it" 
+URL_MODULO_BREVO = "https://647fb00d.sibforms.com/serve/MUIFAJ0dVuXVwv3HVUgXDSbMsvPDu_K-ETsYbd_KsaLMdUddvOZKLunex6H0rzLa4wg3lHNXnJu_UV0fehiZ5jaZVk-epo-5H1QccEFiWRgIIs0fuKFUPswS1nHyowjYVmonIFvT-YxeSK-ZcnIel97D_7hCNp--MlhzfEYBJOTrQYboiXAc5w1JVhfO4uRwGn1c2QCeW0LG4rmkog==" 
 
 st.iframe(URL_MODULO_BREVO, height=520)
 
