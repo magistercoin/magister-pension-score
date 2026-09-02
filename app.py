@@ -15,6 +15,9 @@ def load_data():
 
 df = load_data()
 
+# Controllo presenza colonna rendimento
+has_rendimento = 'rendimento_annuo' in df.columns
+
 # --- 1. HEADER E POSIZIONAMENTO PERSONALE ---
 st.title("📊 Magister Pension Score")
 st.markdown("### Il ranking indipendente e open source dei fondi pensione italiani.")
@@ -58,7 +61,11 @@ cat_mio = dati_mio['macro_categoria']
 # Top fondo della stessa categoria
 top_fondo_cat = df[df['macro_categoria'] == cat_mio].sort_values(by='magister_score', ascending=False).iloc[0]
 
-# Visualizzazione Confronto 1-vs-1 con ISC e Rendimento
+# Gestione sicura del valore rendimento
+rend_mio = f"{dati_mio['rendimento_annuo']:.2f}%" if has_rendimento and pd.notnull(dati_mio.get('rendimento_annuo')) else "N/D"
+rend_top = f"{top_fondo_cat['rendimento_annuo']:.2f}%" if has_rendimento and pd.notnull(top_fondo_cat.get('rendimento_annuo')) else "N/D"
+
+# Visualizzazione Confronto 1-vs-1
 c1, c2 = st.columns(2)
 
 with c1:
@@ -66,14 +73,14 @@ with c1:
     st.metric("Magister Score", f"{dati_mio['magister_score']}/100")
     st.write(f"• **Categoria:** {dati_mio['macro_categoria']}")
     st.write(f"• **ISC 10 Anni (Costo):** {dati_mio['isc_10']:.2f}%")
-    st.write(f"• **Rendimento Annuo:** {dati_mio['rendimento_annuo']:.2f}%")
+    st.write(f"• **Rendimento Annuo 10 Anni:** {rend_mio}")
 
 with c2:
     st.success(f"**TOP DI CATEGORIA ({cat_mio}):** {top_fondo_cat['fondo']} ({top_fondo_cat['comparto']})")
     st.metric("Magister Score", f"{top_fondo_cat['magister_score']}/100", delta=f"{top_fondo_cat['magister_score'] - dati_mio['magister_score']:.1f} punti")
     st.write(f"• **Categoria:** {top_fondo_cat['macro_categoria']}")
     st.write(f"• **ISC 10 Anni (Costo):** {top_fondo_cat['isc_10']:.2f}%")
-    st.write(f"• **Rendimento Annuo:** {top_fondo_cat['rendimento_annuo']:.2f}%")
+    st.write(f"• **Rendimento Annuo 10 Anni:** {rend_top}")
 
 st.markdown("---")
 
@@ -94,12 +101,22 @@ if ricerca_nome:
 
 st.subheader("📋 Classifica Generale Completa")
 
-df_display = df_filtered[['posizione', 'tipo', 'fondo', 'comparto', 'macro_categoria', 'magister_score', 'isc_10', 'rendimento_annuo']].copy()
-df_display.columns = ['Pos.', 'Tipo', 'Fondo Pensione', 'Comparto', 'Categoria', 'Magister Score', 'ISC 10y (Costo)', 'Rendimento Annuo']
+# Definizione colonne dinamica
+cols_to_use = ['posizione', 'tipo', 'fondo', 'comparto', 'macro_categoria', 'magister_score', 'isc_10']
+cols_names = ['Pos.', 'Tipo', 'Fondo Pensione', 'Comparto', 'Categoria', 'Magister Score', 'ISC 10y (Costo)']
+
+if has_rendimento:
+    cols_to_use.append('rendimento_annuo')
+    cols_names.append('Rendimento Annuo 10 Anni')
+
+df_display = df_filtered[cols_to_use].copy()
+df_display.columns = cols_names
 
 df_display['Magister Score'] = df_display['Magister Score'].map('{:.1f} ⭐️'.format)
 df_display['ISC 10y (Costo)'] = df_display['ISC 10y (Costo)'].map('{:.2f}%'.format)
-df_display['Rendimento Annuo'] = df_display['Rendimento Annuo'].map('{:.2f}%'.format)
+
+if has_rendimento:
+    df_display['Rendimento Annuo 10 Anni'] = df_display['Rendimento Annuo 10 Anni'].apply(lambda x: f"{x:.2f}%" if pd.notnull(x) else "N/D")
 
 st.table(df_display)
 
@@ -113,7 +130,7 @@ Il fondo pensione è solo una tessera del tuo puzzle finanziario. Valutare costi
 """)
 
 # INSERISCI QUI IL LINK DEL TUO MODULO BREVO
-URL_MODULO_BREVO = "https://647fb00d.sibforms.com/serve/MUIFAJ0dVuXVwv3HVUgXDSbMsvPDu_K-ETsYbd_KsaLMdUddvOZKLunex6H0rzLa4wg3lHNXnJu_UV0fehiZ5jaZVk-epo-5H1QccEFiWRgIIs0fuKFUPswS1nHyowjYVmonIFvT-YxeSK-ZcnIel97D_7hCNp--MlhzfEYBJOTrQYboiXAc5w1JVhfO4uRwGn1c2QCeW0LG4rmkog==" 
+URL_MODULO_BREVO = "https://www.magistercoin.it" 
 
 st.iframe(URL_MODULO_BREVO, height=520)
 
